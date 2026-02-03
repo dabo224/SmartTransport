@@ -12,7 +12,19 @@ def load_traffic_model():
     global model
     if model is None:
         if os.path.exists(MODEL_PATH):
-            model = joblib.load(MODEL_PATH)
+            try:
+                model = joblib.load(MODEL_PATH)
+            except Exception as e:
+                print(f"Error loading model: {e}")
+                # Fallback hack for specific scikitlearn error if needed
+                import sys
+                import sklearn
+                sys.modules['scikitlearn'] = sklearn
+                try:
+                    model = joblib.load(MODEL_PATH)
+                except Exception as e2:
+                    print(f"Second attempt failed: {e2}")
+                    model = None
         else:
             print(f"Model not found at {MODEL_PATH}")
     return model
@@ -22,41 +34,44 @@ def predict_traffic(request):
     input_data = None
     
     if request.method == 'POST':
-        hour = int(request.POST.get('hour'))
-        day_of_week = request.POST.get('day_of_week')
-        road_type = request.POST.get('road_type')
-        weather = request.POST.get('weather')
-        avg_speed = float(request.POST.get('avg_speed'))
-        
-        input_df = pd.DataFrame([{
-            'hour': hour,
-            'day_of_week': day_of_week,
-            'road_type': road_type,
-            'weather_condition': weather,
-            'avg_speed': avg_speed
-        }])
-        
-        clf = load_traffic_model()
-        if clf:
-            prediction_idx = clf.predict(input_df)[0]
-            levels = {0: 'Faible', 1: 'Moyen', 2: 'Elevé'}
-            prediction = levels.get(prediction_idx, 'Inconnu')
+        try:
+            hour = int(request.POST.get('hour', 12))
+            day_of_week = request.POST.get('day_of_week', 'Monday')
+            road_type = request.POST.get('road_type', 'Urban')
+            weather = request.POST.get('weather', 'Sunny')
+            avg_speed = float(request.POST.get('avg_speed', 40.0))
             
-            # Additional logic for recommended route (mock for now)
-            recommendation = "Itinéraire principal conseillé."
-            if prediction == 'Elevé':
-                recommendation = "Attention : Trafic dense. Nous vous conseillons de prendre les voies secondaires."
-            elif prediction == 'Moyen':
-                recommendation = "Trafic modéré. Surveillez les mises à jour."
-                
-            input_data = {
+            input_df = pd.DataFrame([{
                 'hour': hour,
                 'day_of_week': day_of_week,
                 'road_type': road_type,
-                'weather': weather,
-                'avg_speed': avg_speed,
-                'recommendation': recommendation
-            }
+                'weather_condition': weather,
+                'avg_speed': avg_speed
+            }])
+            
+            clf = load_traffic_model()
+            if clf:
+                prediction_idx = clf.predict(input_df)[0]
+                levels = {0: 'Faible', 1: 'Moyen', 2: 'Elevé'}
+                prediction = levels.get(prediction_idx, 'Inconnu')
+                
+                # Additional logic for recommended route (mock for now)
+                recommendation = "Itinéraire principal conseillé."
+                if prediction == 'Elevé':
+                    recommendation = "Attention : Trafic dense. Nous vous conseillons de prendre les voies secondaires."
+                elif prediction == 'Moyen':
+                    recommendation = "Trafic modéré. Surveillez les mises à jour."
+                    
+                input_data = {
+                    'hour': hour,
+                    'day_of_week': day_of_week,
+                    'road_type': road_type,
+                    'weather': weather,
+                    'avg_speed': avg_speed,
+                    'recommendation': recommendation
+                }
+        except Exception as e:
+            print(f"Prediction error: {e}")
 
     context = {
         'prediction': prediction,

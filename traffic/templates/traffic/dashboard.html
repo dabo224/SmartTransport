@@ -14,87 +14,105 @@
     <link rel="stylesheet" href="{% static 'traffic/css/styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+
+    <!-- External Libraries (Chart.js & Leaflet Heat) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 </head>
 
 <body>
     <header>
-        <h1>SmartTransport</h1>
-        <p>Simulation en temps réel et prédiction intelligente</p>
+        <h1>SmartTransport AI</h1>
+        <p>Intelligence Urbaine en Temps Réel</p>
     </header>
 
     <main class="container">
-        <!-- Dashboard Prediction Form -->
-        <aside class="card">
-            <h2>Paramètres</h2>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="hour">Heure (Prédiction)</label>
-                    <input type="number" id="hour" name="hour" min="0" max="23" value="{{ input_data.hour|default:12 }}"
-                        required>
-                </div>
+        <!-- Dashboard Side Panel -->
+        <aside class="side-panel">
+            <div class="card">
+                <h2>Paramètres</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="hour">Heure de Prédiction</label>
+                        <input type="number" id="hour" name="hour" min="0" max="23"
+                            value="{{ input_data.hour|default:12 }}" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="day_of_week">Jour</label>
-                    <select id="day_of_week" name="day_of_week" required>
-                        {% for day in days %}
-                        <option value="{{ day }}" {% if input_data.day_of_week == day %}selected{% endif %}>{{ day }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="day_of_week">Jour</label>
+                        <select id="day_of_week" name="day_of_week" required>
+                            {% for day in days %}
+                            <option value="{{ day }}" {% if input_data.day_of_week==day %}selected{% endif %}>{{ day }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="road_type">Type de route</label>
-                    <select id="road_type" name="road_type" required>
-                        {% for road in roads %}
-                        <option value="{{ road }}" {% if input_data.road_type == road %}selected{% endif %}>{{ road }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="road_type">Type de route</label>
+                        <select id="road_type" name="road_type" required>
+                            {% for road in roads %}
+                            <option value="{{ road }}" {% if input_data.road_type==road %}selected{% endif %}>{{ road }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="weather">Météo</label>
-                    <select id="weather" name="weather" required>
-                        {% for weather in weathers %}
-                        <option value="{{ weather }}" {% if input_data.weather == weather %}selected{% endif %}>{{ weather
-                            }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="weather">Météo</label>
+                        <select id="weather" name="weather" required>
+                            {% for weather in weathers %}
+                            <option value="{{ weather }}" {% if input_data.weather==weather %}selected{% endif %}>{{
+                                weather
+                                }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <input type="hidden" name="avg_speed" value="{{ input_data.avg_speed|default:40 }}">
-                <button type="submit">Appliquer & Prédire</button>
-            </form>
+                    <input type="hidden" name="avg_speed" value="{{ input_data.avg_speed|default:40 }}">
+                    <button type="submit">Actualiser la Prédiction</button>
+                </form>
 
-            {% if prediction %}
-            <div class="result-card"
-                style="margin-top: 2rem; padding: 1.5rem; border-top: 1px solid var(--glass-border);">
-                <div class="prediction-badge level-{{ prediction }}" style="font-size: 1.5rem; padding: 0.5rem 1rem;">
-                    {{ prediction }}
+                {% if prediction %}
+                <div class="result-card">
+                    <div class="prediction-badge level-{{ prediction }}">
+                        {{ prediction }}
+                    </div>
+                    <div class="recommendation">
+                        {{ input_data.recommendation }}
+                    </div>
                 </div>
-                <div class="recommendation" style="font-size: 0.85rem; margin-top: 1rem;">
-                    {{ input_data.recommendation }}
-                </div>
+                {% endif %}
             </div>
-            {% endif %}
+
+            <!-- New Traffic Trend Chart -->
+            <div class="card chart-card">
+                <h3>Tendances du Trafic</h3>
+                <canvas id="trafficTrendChart"></canvas>
+            </div>
         </aside>
 
         <!-- Map Display -->
         <section id="map-container">
             <div id="map"></div>
-            <div
-                style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(10px); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); color: white; font-size: 0.8rem;">
-                <strong>Simulation :</strong><br>
-                🔴 Points rouges = Trafic dense<br>
-                📍 Cliquez sur la carte pour choisir une destination
+            <div class="simulation-overlay">
+                <strong class="overlay-title">Live Traffic Monitoring</strong>
+                <div class="overlay-item">
+                    <span class="status-dot pulses"></span>
+                    <span>Modèle de prédiction actif</span>
+                </div>
+                <div class="overlay-item">
+                    <span class="status-dot static"></span>
+                    <span>Analyse de densité par zone</span>
+                </div>
+                <small class="overlay-hint">📍 Cliquez sur la carte pour un itinéraire</small>
             </div>
         </section>
     </main>
 
-    <footer style="margin-top: 4rem; color: var(--text-secondary); font-size: 0.8rem; text-align: center;">
-        &copy; 2026 SmartTransport AI Project
+    <footer>
+        &copy; 2026 SmartTransport AI - Advanced Urban Prediction System
     </footer>
 
     <!-- Scripts -->
