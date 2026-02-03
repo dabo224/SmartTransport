@@ -1,35 +1,45 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartTransport | Prédiction de Trafic Intelligent</title>
+    <title>SmartTransport | Carte & Trafic</title>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
     <link rel="stylesheet" href="{% static 'traffic/css/styles.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <header>
         <h1>SmartTransport</h1>
-        <p>Optimisez vos déplacements grâce à l'intelligence artificielle</p>
+        <p>Simulation en temps réel et prédiction intelligente</p>
     </header>
 
     <main class="container">
         <!-- Dashboard Prediction Form -->
-        <section class="card">
-            <h2>Paramètres de Trajet</h2>
+        <aside class="card">
+            <h2>Paramètres</h2>
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="hour">Heure (0-23)</label>
-                    <input type="number" id="hour" name="hour" min="0" max="23" value="{{ input_data.hour|default:12 }}" required>
+                    <label for="hour">Heure (Prédiction)</label>
+                    <input type="number" id="hour" name="hour" min="0" max="23" value="{{ input_data.hour|default:12 }}"
+                        required>
                 </div>
 
                 <div class="form-group">
-                    <label for="day_of_week">Jour de la semaine</label>
+                    <label for="day_of_week">Jour</label>
                     <select id="day_of_week" name="day_of_week" required>
                         {% for day in days %}
-                            <option value="{{ day }}" {% if input_data.day_of_week == day %}selected{% endif %}>{{ day }}</option>
+                        <option value="{{ day }}" {% if input_data.day_of_week == day %}selected{% endif %}>{{ day }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -38,64 +48,59 @@
                     <label for="road_type">Type de route</label>
                     <select id="road_type" name="road_type" required>
                         {% for road in roads %}
-                            <option value="{{ road }}" {% if input_data.road_type == road %}selected{% endif %}>{{ road }}</option>
+                        <option value="{{ road }}" {% if input_data.road_type == road %}selected{% endif %}>{{ road }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="weather">Conditions météorologiques</label>
+                    <label for="weather">Météo</label>
                     <select id="weather" name="weather" required>
                         {% for weather in weathers %}
-                            <option value="{{ weather }}" {% if input_data.weather == weather %}selected{% endif %}>{{ weather }}</option>
+                        <option value="{{ weather }}" {% if input_data.weather == weather %}selected{% endif %}>{{ weather
+                            }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="avg_speed">Vitesse moyenne estimée (km/h)</label>
-                    <input type="number" id="avg_speed" name="avg_speed" step="0.1" value="{{ input_data.avg_speed|default:40 }}" required>
-                </div>
-
-                <button type="submit">Prédire le Trafic</button>
+                <input type="hidden" name="avg_speed" value="{{ input_data.avg_speed|default:40 }}">
+                <button type="submit">Appliquer & Prédire</button>
             </form>
-        </section>
 
-        <!-- Prediction Result Display -->
-        <section class="card result-card">
-            <h2>Résultat de la Prédiction</h2>
-            
             {% if prediction %}
-                <div class="prediction-badge level-{{ prediction }}">
+            <div class="result-card"
+                style="margin-top: 2rem; padding: 1.5rem; border-top: 1px solid var(--glass-border);">
+                <div class="prediction-badge level-{{ prediction }}" style="font-size: 1.5rem; padding: 0.5rem 1rem;">
                     {{ prediction }}
                 </div>
-                
-                <div class="recommendation">
-                    <strong>Recommandation :</strong><br>
+                <div class="recommendation" style="font-size: 0.85rem; margin-top: 1rem;">
                     {{ input_data.recommendation }}
                 </div>
-                
-                <div style="margin-top: 1.5rem; text-align: left; width: 100%; font-size: 0.9rem; color: var(--text-secondary);">
-                    <p>Récapitulatif des données :</p>
-                    <ul style="list-style: none; margin-top: 0.5rem;">
-                        <li>• Route: {{ input_data.road_type }}</li>
-                        <li>• Météo: {{ input_data.weather }}</li>
-                        <li>• Vitesse: {{ input_data.avg_speed }} km/h</li>
-                    </ul>
-                </div>
-            {% else %}
-                <p class="placeholder-text">Veuillez remplir le formulaire pour obtenir une prédiction en temps réel.</p>
-                <div style="margin-top: 2rem; opacity: 0.2;">
-                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
-                </div>
+            </div>
             {% endif %}
+        </aside>
+
+        <!-- Map Display -->
+        <section id="map-container">
+            <div id="map"></div>
+            <div
+                style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(10px); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); color: white; font-size: 0.8rem;">
+                <strong>Simulation :</strong><br>
+                🔴 Points rouges = Trafic dense<br>
+                📍 Cliquez sur la carte pour choisir une destination
+            </div>
         </section>
     </main>
 
     <footer style="margin-top: 4rem; color: var(--text-secondary); font-size: 0.8rem; text-align: center;">
-        &copy; 2026 SmartTransport AI Project - Améliorer la mobilité urbaine.
+        &copy; 2026 SmartTransport AI Project
     </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="{% static 'traffic/js/map_logic.js' %}"></script>
 </body>
+
 </html>

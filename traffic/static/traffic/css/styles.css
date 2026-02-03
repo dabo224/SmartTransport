@@ -51,12 +51,27 @@ header p {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1200px;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 350px 1fr;
     gap: 2rem;
     animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+#map-container {
+    height: 600px;
+    width: 100%;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--glass-border);
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
 }
 
 @media (max-width: 768px) {
@@ -100,7 +115,8 @@ header p {
     font-weight: 500;
 }
 
-.form-group select, .form-group input {
+.form-group select,
+.form-group input {
     width: 100%;
     padding: 0.75rem 1rem;
     background: rgba(15, 23, 42, 0.6);
@@ -112,7 +128,8 @@ header p {
     transition: border-color 0.2s;
 }
 
-.form-group select:focus, .form-group input:focus {
+.form-group select:focus,
+.form-group input:focus {
     border-color: var(--accent-color);
 }
 
@@ -154,9 +171,23 @@ button:hover {
     box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
 }
 
-.level-Faible { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-.level-Moyen { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-.level-Elevé { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.level-Faible {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.level-Moyen {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.level-Elevé {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
 
 .recommendation {
     margin-top: 2rem;
@@ -174,11 +205,25 @@ button:hover {
 }
 
 @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
