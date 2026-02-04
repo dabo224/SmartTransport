@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTransport | Accueil</title>
+    <link rel="stylesheet" href="{% static 'traffic/css/styles.css' %}">
+    <style>
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--accent-color);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 0.75rem;
+            font-weight: 800;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero">
+        <header>
+            <h1>SmartTransport</h1>
+            <p>Le futur de la mobilité urbaine commence ici.</p>
+        </header>
+
+        <div class="card" style="max-width: 600px;">
+            <p>Bienvenue sur la plateforme SmartTransport. Cette page est en cours de construction par un autre membre
+                de l'équipe.</p>
+            <a href="{% url 'dashboard' %}" class="cta-button">Accéder au Dashboard AI</a>
+        </div>
+    </div>
+</body>
+
+</html>
