@@ -43,7 +43,7 @@
                         <label for="day_of_week">Jour</label>
                         <select id="day_of_week" name="day_of_week" required>
                             {% for day in days %}
-                            <option value="{{ day }}" {% if input_data.day_of_week==day %}selected{% endif %}>{{ day }}
+                            <option value="{{ day }}" {% if input_data.day_of_week == day %}selected{% endif %}>{{ day }}
                             </option>
                             {% endfor %}
                         </select>
@@ -53,7 +53,7 @@
                         <label for="road_type">Type de route</label>
                         <select id="road_type" name="road_type" required>
                             {% for road in roads %}
-                            <option value="{{ road }}" {% if input_data.road_type==road %}selected{% endif %}>{{ road }}
+                            <option value="{{ road }}" {% if input_data.road_type == road %}selected{% endif %}>{{ road }}
                             </option>
                             {% endfor %}
                         </select>
@@ -63,7 +63,7 @@
                         <label for="weather">Météo</label>
                         <select id="weather" name="weather" required>
                             {% for weather in weathers %}
-                            <option value="{{ weather }}" {% if input_data.weather==weather %}selected{% endif %}>{{
+                            <option value="{{ weather }}" {% if input_data.weather == weather %}selected{% endif %}>{{
                                 weather
                                 }}</option>
                             {% endfor %}
