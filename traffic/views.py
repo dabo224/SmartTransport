@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 from django.shortcuts import render
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 # Load the model
 MODEL_PATH = os.path.join(settings.BASE_DIR, 'ml_module', 'traffic_model.joblib')
@@ -19,7 +20,7 @@ def load_traffic_model():
                 # Fallback hack for specific scikitlearn error if needed
                 import sys
                 import sklearn
-                sys.modules['scikitlearn'] = sklearn
+                sys.modules['sklearn'] = sklearn
                 try:
                     model = joblib.load(MODEL_PATH)
                 except Exception as e2:
@@ -29,9 +30,16 @@ def load_traffic_model():
             print(f"Model not found at {MODEL_PATH}")
     return model
 
+@login_required
 def predict_traffic(request):
     prediction = None
-    input_data = None
+    input_data = {
+        'hour': 12,
+        'day_of_week': 'Monday',
+        'road_type': 'Urban',
+        'weather': 'Sunny',
+        'avg_speed': 40.0
+    }
     
     if request.method == 'POST':
         try:

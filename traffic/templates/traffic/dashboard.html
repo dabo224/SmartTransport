@@ -22,8 +22,20 @@
 
 <body>
     <header>
-        <h1>SmartTransport AI</h1>
-        <p>Intelligence Urbaine en Temps Réel</p>
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%;">
+            <div style="flex: 1;"></div>
+            <div style="flex: 2;">
+                <h1>SmartTransport AI</h1>
+                <p>Intelligence Urbaine en Temps Réel</p>
+            </div>
+            <div style="flex: 1; text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Connecté: <strong>{{ user.username
+                        }}</strong></span>
+                <a href="{% url 'logout' %}"
+                    style="color: var(--accent-color); font-size: 0.8rem; text-decoration: none; font-weight: 600; margin-top: 0.25rem;">Déconnexion</a>
+            </div>
+        </div>
     </header>
 
     <main class="container">
@@ -43,7 +55,7 @@
                         <label for="day_of_week">Jour</label>
                         <select id="day_of_week" name="day_of_week" required>
                             {% for day in days %}
-                            <option value="{{ day }}" {% if input_data.day_of_week == day %}selected{% endif %}>{{ day }}
+                            <option value="{{ day }}" {% if input_data.day_of_week==day %}selected{% endif %}>{{ day }}
                             </option>
                             {% endfor %}
                         </select>
@@ -53,7 +65,7 @@
                         <label for="road_type">Type de route</label>
                         <select id="road_type" name="road_type" required>
                             {% for road in roads %}
-                            <option value="{{ road }}" {% if input_data.road_type == road %}selected{% endif %}>{{ road }}
+                            <option value="{{ road }}" {% if input_data.road_type==road %}selected{% endif %}>{{ road }}
                             </option>
                             {% endfor %}
                         </select>
@@ -63,7 +75,7 @@
                         <label for="weather">Météo</label>
                         <select id="weather" name="weather" required>
                             {% for weather in weathers %}
-                            <option value="{{ weather }}" {% if input_data.weather == weather %}selected{% endif %}>{{
+                            <option value="{{ weather }}" {% if input_data.weather==weather %}selected{% endif %}>{{
                                 weather
                                 }}</option>
                             {% endfor %}

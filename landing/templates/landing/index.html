@@ -44,9 +44,22 @@
         </header>
 
         <div class="card" style="max-width: 600px;">
-            <p>Bienvenue sur la plateforme SmartTransport. Cette page est en cours de construction par un autre membre
-                de l'équipe.</p>
-            <a href="{% url 'dashboard' %}" class="cta-button">Accéder au Dashboard AI</a>
+            <p>Bienvenue sur la plateforme SmartTransport. Une solution intelligente pour la mobilité urbaine.</p>
+
+            {% if user.is_authenticated %}
+            <p style="margin-bottom: 1rem;">Connecté en tant que <strong>{{ user.username }}</strong></p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="{% url 'dashboard' %}" class="cta-button">Accéder au Dashboard</a>
+                <a href="{% url 'logout' %}" class="cta-button"
+                    style="background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border);">Déconnexion</a>
+            </div>
+            {% else %}
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="{% url 'login' %}" class="cta-button">Se connecter</a>
+                <a href="{% url 'signup' %}" class="cta-button"
+                    style="background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border);">S'inscrire</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>
